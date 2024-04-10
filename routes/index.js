@@ -10,7 +10,7 @@ const crypto = require('crypto');
 const upload = multer({ dest: 'uploads/' });
 /* GET home page. */
 router.get('/', function (req, res, next) {
-  res.render('index', { title: 'Express' });
+  res.render('index',{  title: 'BioSecureCert' });
 });
 
 async function createPDF(data, uui) {
@@ -188,7 +188,7 @@ router.post('/verify', upload.single('file'), async (req, res, next) => {
       even: cert.event
     }];
     console.log(data);
-    res.render('success', { data });
+    res.render('success', {layout: 'layoutA', data });
     // delete upload
     fs.unlink(req.file.path, (err) => {
       if (err) {

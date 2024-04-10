@@ -1,34 +1,38 @@
 <!DOCTYPE html>
 <html>
-  <head>
-    <title>{{title}}</title>
-    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.4.1/css/bootstrap.min.css">
-    <link rel="stylesheet" href="https://fonts.googleapis.com/icon?family=Material+Icons">
-  </head>
-  <body>
-    <div class="container">
-    <header class="header">
-        <h1 id="title" class="text-center">BioSecureCert</h1>
-        <p id="description" class="text-center">
-            The secure way to get your certificate!
-        </p>
-        <div class="row">
-            <div class="col-md-6">
-                <a href="/" id="submit" class="btn btn-primary btn-block">Generate Certificate</a>
-            </div>
-            <div class="col-md-6">
-                <a href="/verify" id="submit" class="btn btn-primary btn-block">Verify Certificate</a>
 
-            </div>
+<head>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.4.1/jquery.min.js"></script>
+  <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+  <title>{{title}}</title>
+  <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.4.1/css/bootstrap.min.css">
+  <link rel="stylesheet" href="https://fonts.googleapis.com/icon?family=Material+Icons">
+</head>
+
+<body>
+  <div class="container">
+    <header class="header">
+      <h1 id="title" class="text-center">BioSecureCert</h1>
+      <p id="description" class="text-center">
+        The secure way to get your certificate!
+      </p>
+      <div class="row">
+        <div class="col-md-6">
+          <a href="/" id="submit" class="btn btn-primary btn-block">Generate Certificate</a>
         </div>
+        <div class="col-md-6">
+          <a href="/verify" id="submit" class="btn btn-primary btn-block">Verify Certificate</a>
+
+        </div>
+      </div>
     </header>
     {{{body}}}
-    </div>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.4.1/jquery.min.js"></script>
-    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+  </div>
 
-    <script src="https://cdn.jsdelivr.net/npm/popper.js@1.16.0/dist/umd/popper.min.js"></script>
-    <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.4.1/js/bootstrap.min.js"></script>
-    
-  </body>
+
+  <script src="https://cdn.jsdelivr.net/npm/popper.js@1.16.0/dist/umd/popper.min.js"></script>
+  <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.4.1/js/bootstrap.min.js"></script>
+
+</body>
+
 </html>
