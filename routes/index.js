@@ -1,11 +1,13 @@
 var express = require('express');
 var router = express.Router();
 var path = require('path');
+const multer = require('multer');
 const { v4: uuidv4 } = require('uuid');
 const Cert = require('../db');
 const PDFDocument = require('pdfkit');
 const fs = require('fs');
 const crypto = require('crypto');
+const upload = multer({ dest: 'uploads/' });
 /* GET home page. */
 router.get('/', function (req, res, next) {
   res.render('index', { title: 'Express' });
@@ -124,9 +126,14 @@ router.post('/generate', async (req, res, next) => {
     const fileBuffer = fs.readFileSync('certificates/' + uui + '.pdf')
     const hashSum = crypto.createHash('sha256');
     hashSum.update(fileBuffer);
-    finalhash=hashSum.update(data['fingerprint']);
-    const hex = hashSum.digest('hex');
- 
+    finalhash = hashSum.update(data['fingerprint']);
+    const hex = finalhash.digest('hex');
+    // if already present in db show error
+    const cert = await Cert.findOne({ hash: hex });
+    if (cert) {
+      return res.render('verify', { fail: 'Certificate already exists' });
+    }
+
     const newCert = new Cert({
       name: data['name'],
       email: data['email'],
@@ -150,5 +157,55 @@ router.post('/generate', async (req, res, next) => {
 router.get('/certificates/:id', function (req, res, next) {
   res.download(`certificates/` + req.params.id + `.pdf`);
 });
+router.get('/verify', async (req, res, next) => {
+  res.render('verify', { success: 'success' });
+});
+router.post('/verify', upload.single('file'), async (req, res, next) => {
+
+  // check the file hash
+
+  const fileBuffer = fs.readFileSync(req.file.path)
+  const hashSum = crypto.createHash('sha256');
+  hashSum.update(fileBuffer);
+  finalhash = hashSum.update(req.body.fingerprint);
+  const hex = finalhash.digest('hex');
+
+  // check the fingerprint
+  const fingerprint = req.body.fingerprint;
+  console.log(hex, fingerprint);
+  const cert = await Cert.findOne({ hash: hex, fingerprint: fingerprint });
+  if (cert) {
+
+    data = [{
+      uuid: cert.uuid,
+      nam: cert.name,
+      authority: cert.authority,
+      role: cert.certificateType,
+      email: cert.email,
+      College: cert.College,
+      Phone: cert.Phone,
+      comment: cert.comment,
+      even: cert.event
+    }];
+    console.log(data);
+    res.render('success', { data });
+    // delete upload
+    fs.unlink(req.file.path, (err) => {
+      if (err) {
+        console.error('Error: ', err);
+      }
+    });
+
+  } else {
+    res.render('verify', { error: 'Certificate not found' });
+    // delete upload
+    fs.unlink(req.file.path, (err) => {
+      if (err) {
+        console.error('Error:', err);
+      }
+    });
+  }
+
+})
 
 module.exports = router;

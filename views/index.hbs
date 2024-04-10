@@ -1,109 +1,122 @@
-<div class="container">
-    <header class="header">
-        <h1 id="title" class="text-center">BioSecureCert</h1>
-        <p id="description" class="text-center">
-            The secure way to get your certificate!
-        </p>
-    </header>
-    <div class="form-wrap">
-        <form action="/generate" method="POST" id="survey-form">
-            <div class="row">
-                <div class="col-md-6">
-                    <div class="form-group">
-                        <label id="name-label" for="name">Name</label>
-                        <input type="text" name="name" id="name" placeholder="Enter your name" class="form-control"
-                            required>
-                    </div>
-                </div>
-                <div class="col-md-6">
-                    <div class="form-group">
-                        <label id="email-label" for="email">Email</label>
-                        <input type="email" name="email" id="email" placeholder="Enter your email" class="form-control"
-                            required>
-                    </div>
-                </div>
+<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/crypto-js/3.1.9-1/crypto-js.min.js"></script>
 
-            </div>
-
-            <div class="row">
-                <div class="col-md-12">
-                    <div class="form-group">
-                        <label id="name-label" for="name">Fingerprint Hash (Generated automatically for demonstration,
-                            To be fetched from reader in real life application.)</label>
-                        <input type="text" name="fingerprint" id="name"
-                            placeholder="44863b03e9909b7100e05b02526909a346fd7455183f6619e0fe6198c89981e0"
-                            class="form-control" required>
-                    </div>
-                </div>
-
-            </div>
-            <div class="row">
-                <div class="col-md-6">
-                    <div class="form-group">
-                        <label id="authority-label" for="institution">Certifying Authority</label>
-                        <input type="text" name="authority" id="authority" placeholder="Enter Authority"
-                            class="form-control" required>
-                    </div>
-                </div>
-                <div class="col-md-6">
-                    <div class="form-group">
-                        <label>Certificate Type</label>
-                        <select id="dropdown" name="role" class="form-control" required>
-                            <option disabled selected value>Select</option>
-                            <option value="Winner">Winner</option>
-                            <option value="Runnerup">Runnerup</option>
-                            <option value="Top 10">Top 10</option>
-                            <option value="Participation">Participation</option>
-
-                        </select>
-                    </div>
+<div class="form-wrap">
+    <form action="/generate" method="POST" id="survey-form">
+        <div class="row">
+            <div class="col-md-6">
+                <div class="form-group">
+                    <label id="name-label" for="name">Name</label>
+                    <input type="text" name="name" id="name" placeholder="Enter your name" class="form-control"
+                        required>
                 </div>
             </div>
-            <div class="row">
-                <div class="col-md-4">
-                    <div class="form-group">
-                        <label id="College-label" for="institution">College/Instituion</label>
-                        <input type="text" name="College" id="College" placeholder="Enter College" class="form-control"
-                            required>
-                    </div>
-                </div>
-                <div class="col-md-4">
-                    <div class="form-group">
-                        <label id="Phone-label" for="institution">Phone Number</label>
-                        <input type="number" name="Phone" id="Phone" placeholder="Enter Phone" class="form-control"
-                            required>
-                    </div>
-                </div>
-                <div class="col-md-4">
-                    <div class="form-group">
-                        <label>Event Name</label>
-                        <input type="text" id="event" class="form-control" name="event" placeholder="Event Name">
-                    </div>
+            <div class="col-md-6">
+                <div class="form-group">
+                    <label id="email-label" for="email">Email</label>
+                    <input type="email" name="email" id="email" placeholder="Enter your email" class="form-control"
+                        required>
                 </div>
             </div>
 
+        </div>
 
-
-
-            <div class="row">
-                <div class="col-md-12">
-                    <div class="form-group">
-                        <label>Leave Comment</label>
-                        <textarea id="comments" class="form-control" name="comment"
-                            placeholder="Enter your comment here..."></textarea>
-                    </div>
+        <div class="row">
+            <div class="col-md-12">
+                <div class="form-group">
+                    <label id="name-label" for="name">Fingerprint Hash (Generated automatically for demonstration,
+                        To be fetched from reader in real life application.)</label>
+                    <input type="text" name="fingerprint" id="fingerprint"
+                        placeholder="44863b03e9909b7100e05b02526909a346fd7455183f6619e0fe6198c89981e0"
+                        class="form-control" required>
                 </div>
             </div>
-
-            <div class="row">
-                <div class="col-md-4">
-                    <button type="submit" id="submit" class="btn btn-primary btn-block">Generate Certificate</button>
-                </div>
+            <div class="col-md-4">
+                <button type="button" id="generateHashButton" class="btn btn-primary">Read Fingerprint</button>
             </div>
 
-        </form>
-    </div>
+        </div>
+        <br>
+        <div class="row">
+            <div class="col-md-6">
+                <div class="form-group">
+                    <label id="authority-label" for="institution">Certifying Authority</label>
+                    <input type="text" name="authority" id="authority" placeholder="Enter Authority"
+                        class="form-control" required>
+                </div>
+            </div>
+            <div class="col-md-6">
+                <div class="form-group">
+                    <label>Certificate Type</label>
+                    <select id="dropdown" name="role" class="form-control" required>
+                        <option disabled selected value>Select</option>
+                        <option value="Winner">Winner</option>
+                        <option value="Runnerup">Runnerup</option>
+                        <option value="Top 10">Top 10</option>
+                        <option value="Participation">Participation</option>
+
+                    </select>
+                </div>
+            </div>
+        </div>
+        <div class="row">
+            <div class="col-md-4">
+                <div class="form-group">
+                    <label id="College-label" for="institution">College/Instituion</label>
+                    <input type="text" name="College" id="College" placeholder="Enter College" class="form-control"
+                        required>
+                </div>
+            </div>
+            <div class="col-md-4">
+                <div class="form-group">
+                    <label id="Phone-label" for="institution">Phone Number</label>
+                    <input type="number" name="Phone" id="Phone" placeholder="Enter Phone" class="form-control"
+                        required>
+                </div>
+            </div>
+            <div class="col-md-4">
+                <div class="form-group">
+                    <label>Event Name</label>
+                    <input type="text" id="event" class="form-control" name="event" placeholder="Event Name">
+                </div>
+            </div>
+        </div>
+
+
+
+
+        <div class="row">
+            <div class="col-md-12">
+                <div class="form-group">
+                    <label>Leave Comment</label>
+                    <textarea id="comments" class="form-control" name="comment"
+                        placeholder="Enter your comment here..."></textarea>
+                </div>
+            </div>
+        </div>
+
+        <div class="row">
+            <div class="col-md-4">
+                <button type="submit" id="submit" class="btn btn-primary btn-block">Generate Certificate</button>
+            </div>
+        </div>
+
+    </form>
 </div>
+
+<script>
+    $(document).ready(function () {
+        $('#generateHashButton').click(function () {
+            // Generate a random string (you can customize the length as needed)
+            var randomString = Math.random().toString(36).substring(7);
+            // Generate SHA hash of the random string
+            var shaHash = CryptoJS.SHA256(randomString).toString(CryptoJS.enc.Hex);
+            // Set the generated hash as the value of the input field
+            $('#fingerprint').val(shaHash);
+        });
+    });
+</script>
+</script>
 <style>
     @import url('https://fonts.googleapis.com/css?family=Roboto:400,500,700,900&display=swap');
 
