@@ -4,14 +4,69 @@ var path = require('path');
 const multer = require('multer');
 const { v4: uuidv4 } = require('uuid');
 const Cert = require('../db');
+const Issuer = require('../issuerdb');
 const PDFDocument = require('pdfkit');
 const fs = require('fs');
 const crypto = require('crypto');
+const bcrypt = require('bcrypt');
+const { requireLogin } = require('../middlewares/auth');
 const upload = multer({ dest: 'uploads/' });
 /* GET home page. */
-router.get('/', function (req, res, next) {
-  res.render('index',{  title: 'BioSecureCert' });
+router.get('/', requireLogin, function (req, res, next) {
+  res.render('index', { title: 'BioSecureCert' });
 });
+
+router.get('/login', (req, res) => {
+  res.render('login', { layout: 'loginLayout' });
+});
+router.get('/register', (req, res) => {
+  res.render('register', { layout: 'loginLayout' });
+});
+router.post('/login', async (req, res) => {
+  const { username, password } = req.body;
+  try {
+    const issuer = await Issuer.findOne({ username });
+    if (issuer && await bcrypt.compare(password, issuer.password)) {
+      req.session.issuerId = issuer._id;
+      console.log(req.session);
+      res.redirect('/');
+    } else {
+      res.redirect('/login');
+    }
+  } catch (error) {
+    console.error(error);
+    res.status(500).send('Internal Server Error');
+  }
+});
+router.get('/logout', (req, res) => {
+  req.session.destroy(() => {
+    res.redirect('/login');
+  });
+});
+router.post('/register', async (req, res) => {
+  const { username, password } = req.body;
+  try {
+    // Check if the username already exists
+    const existingIssuer = await Issuer.findOne({ username });
+    if (existingIssuer) {
+      return res.status(400).send('Username already exists');
+    }
+    // Hash the password
+    const hashedPassword = await bcrypt.hash(password, 10);
+    // Create a new issuer
+    const newIssuer = new Issuer({
+      username,
+      password: hashedPassword
+    });
+    he = await newIssuer.save();
+    console.log(he);
+    res.redirect('/login');
+  } catch (error) {
+    console.error(error);
+    res.status(500).send('Internal Server Error');
+  }
+});
+
 
 async function createPDF(data, uui) {
   return new Promise((resolve, reject) => {
@@ -116,7 +171,7 @@ async function createPDF(data, uui) {
   })
 }
 
-router.post('/generate', async (req, res, next) => {
+router.post('/generate', requireLogin, async (req, res, next) => {
   try {
     var data = req.body;
     console.log(data);
@@ -145,7 +200,8 @@ router.post('/generate', async (req, res, next) => {
       event: data['event'],
       comment: data['comment'],
       hash: hex,
-      uuid: uui
+      uuid: uui,
+      issuer: req.session.issuerId
     });
     await newCert.save();
     res.redirect(`certificates/${uui}`)
@@ -154,13 +210,13 @@ router.post('/generate', async (req, res, next) => {
     res.status(500).send('An error occurred while generating the certificate.');
   }
 });
-router.get('/certificates/:id', function (req, res, next) {
+router.get('/certificates/:id', requireLogin, function (req, res, next) {
   res.download(`certificates/` + req.params.id + `.pdf`);
 });
-router.get('/verify', async (req, res, next) => {
+router.get('/verify', requireLogin, async (req, res, next) => {
   res.render('verify', { success: 'success' });
 });
-router.post('/verify', upload.single('file'), async (req, res, next) => {
+router.post('/verify', requireLogin, upload.single('file'), async (req, res, next) => {
 
   // check the file hash
 
@@ -179,6 +235,7 @@ router.post('/verify', upload.single('file'), async (req, res, next) => {
     data = [{
       uuid: cert.uuid,
       nam: cert.name,
+      issuer: cert.issuer,
       authority: cert.authority,
       role: cert.certificateType,
       email: cert.email,
@@ -188,7 +245,7 @@ router.post('/verify', upload.single('file'), async (req, res, next) => {
       even: cert.event
     }];
     console.log(data);
-    res.render('success', {layout: 'layoutA', data });
+    res.render('success', { layout: 'layoutA', data });
     // delete upload
     fs.unlink(req.file.path, (err) => {
       if (err) {
@@ -207,5 +264,37 @@ router.post('/verify', upload.single('file'), async (req, res, next) => {
   }
 
 })
+router.get('/view', requireLogin, async (req, res, next) => {
+  const cert = await Cert.find({ issuer: req.session.issuerId });
+  console.log(cert);
+
+
+
+
+  res.render('viewdata', { layout: 'layoutA', cert });
+});
+router.post('/revoke', async (req, res) => {
+  const { certificateId } = req.body;
+  try {
+    // Find the certificate by ID
+    const certificate = await Cert.findById(certificateId);
+    if (!certificate) {
+      return res.status(404).send('Certificate not found');
+    }
+    // Check if the issuer ID matches the logged-in issuer ID
+    if (certificate.issuer.toString() === req.session.issuerId) {
+      // Perform the revocation action here
+      // For example, you can update the certificate status or delete it
+      // Here, let's just delete the certificate
+      await certificate.deleteOne();
+      return res.redirect('/view');
+    } else {
+      return res.status(403).send('You are not authorized to revoke this certificate');
+    }
+  } catch (error) {
+    console.error(error);
+    res.status(500).send('Internal Server Error');
+  }
+});
 
 module.exports = router;

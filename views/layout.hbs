@@ -12,17 +12,27 @@
 <body>
   <div class="container">
     <header class="header">
+      <div class="col-md-3">
+        {{#if isLoggedIn}}
+        <a href="/logout" class="btn btn-primary btn-block">Logout</a>
+        {{else}}
+        <a href="/login" class="btn btn-primary btn-block">Login</a>
+        {{/if}}
+      </div>
       <h1 id="title" class="text-center">BioSecureCert</h1>
       <p id="description" class="text-center">
         The secure way to get your certificate!
       </p>
       <div class="row">
-        <div class="col-md-6">
+        <div class="col-md-4">
           <a href="/" id="submit" class="btn btn-primary btn-block">Generate Certificate</a>
         </div>
-        <div class="col-md-6">
+        <div class="col-md-4">
           <a href="/verify" id="submit" class="btn btn-primary btn-block">Verify Certificate</a>
 
+        </div>
+        <div class="col-md-4">
+          <a href="/view" class="btn btn-primary btn-block">View Issued Certificates</a>
         </div>
       </div>
     </header>
