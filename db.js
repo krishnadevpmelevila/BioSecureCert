@@ -1,7 +1,7 @@
 require('dotenv').config();
 const mongoose = require('mongoose');
 
-// Define the schema for the data
+// Define the schema for the Certificate table
 const certSchema = new mongoose.Schema({
     name: String,
     email: String,
