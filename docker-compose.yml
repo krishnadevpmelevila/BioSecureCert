@@ -1,0 +1,17 @@
+version: '1'
+services:
+  app:
+    container_name: biosecurecert-app
+    restart: always
+    build: .
+    ports:
+      - "3000:3000"
+    environment:
+      NODE_ENV: production
+    links:
+      - mongo
+  mongo:
+    container_name: mongo
+    image: mongo
+    ports:
+      - "27017:27017"
