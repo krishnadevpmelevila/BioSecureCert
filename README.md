@@ -44,4 +44,4 @@ the process for submitting pull requests.
 This project is licensed under the MIT License - see the [LICENSE](LICENSE.md) file for details.
 ## Contact
 For major questions, further information, or if you want to get in touch, please email us at
-[your-email@example.com](mailto:krishnadevpmelevila@gmail.com).
+[krishnadevpmelevila@gmail.com@example.com](mailto:krishnadevpmelevila@gmail.com).
